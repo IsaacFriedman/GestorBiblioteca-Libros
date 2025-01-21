@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    
+    <!-- Colores principales -->
+    <color name="primary">#4FD1C5</color>         <!-- Verde menta/turquesa -->
+    <color name="primary_dark">#319795</color>    <!-- Verde menta oscuro -->
+    <color name="primary_light">#B2F5EA</color>   <!-- Verde menta claro -->
+    
+    <!-- Color de acento -->
+    <color name="accent">#FF6B6B</color>          <!-- Coral vibrante -->
+    
+    <!-- Colores de fondo y texto -->
+    <color name="background">#F0FFF4</color>      <!-- Verde menta muy claro -->
+    <color name="text_primary">#2D3748</color>    <!-- Gris azulado oscuro -->
+    <color name="text_secondary">#718096</color>  <!-- Gris azulado medio -->
+    
+    <!-- Colores de botones -->
+    <color name="button_enabled">#4FD1C5</color>  <!-- Verde menta/turquesa -->
+    <color name="button_disabled">#CBD5E0</color> <!-- Gris claro -->
+    <color name="divider">#E2E8F0</color>        <!-- Gris muy claro -->
+    <color name="button_background_color">#4FD1C5</color> <!-- Verde menta/turquesa -->
+</resources>

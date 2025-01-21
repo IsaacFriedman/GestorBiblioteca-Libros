@@ -1,0 +1,2 @@
+1|Biblioteca Central|Avenida Principal 123|50000.0|2020-05-15
+2|Biblioteca Norte|Calle Secundaria 45|30000.0|2018-03-10
