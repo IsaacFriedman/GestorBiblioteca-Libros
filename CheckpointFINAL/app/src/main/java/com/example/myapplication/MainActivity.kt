@@ -9,10 +9,17 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.databinding.ActivityMainBinding
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMainBinding
     private var db: SQLiteDatabase? = null
+    private var mMap: GoogleMap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +29,11 @@ class MainActivity : AppCompatActivity() {
         createDatabase()
         setupSpinner()
         setupButtons()
+
+        // Inicializar el mapa
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
     }
 
     private fun createDatabase() {
@@ -161,10 +173,47 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onMapReady(googleMap: GoogleMap) {
+        mMap = googleMap
+        actualizarMarcadoresBibliotecas()
+    }
+
+    private fun actualizarMarcadoresBibliotecas() {
+        mMap?.clear() // Limpiar marcadores existentes
+        
+        try {
+            val cursor = db?.rawQuery(
+                """
+                SELECT nombre, latitud, longitud
+                FROM ${ConnectionClass.TABLE_BIBLIOTECA}
+                """,
+                null
+            )
+
+            cursor?.use {
+                while (it.moveToNext()) {
+                    val nombre = it.getString(it.getColumnIndexOrThrow(ConnectionClass.COL_BIBLIOTECA_NOMBRE))
+                    val latitud = it.getDouble(it.getColumnIndexOrThrow(ConnectionClass.COL_BIBLIOTECA_LATITUD))
+                    val longitud = it.getDouble(it.getColumnIndexOrThrow(ConnectionClass.COL_BIBLIOTECA_LONGITUD))
+                    
+                    val posicion = LatLng(latitud, longitud)
+                    mMap?.addMarker(MarkerOptions().position(posicion).title(nombre))
+                }
+
+                // Centrar el mapa en Quito
+                val quito = LatLng(-0.225219, -78.5248)
+                mMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(quito, 12f))
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, "Error al cargar bibliotecas en el mapa: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         db = ConnectionClass.getConnection(this)
-
+        actualizarMarcadoresBibliotecas()
+        
         if (binding.spinnerTipo.selectedItemPosition == 2 && !bibliotecasDisponibles()) {
             binding.spinnerTipo.setSelection(0)
         }

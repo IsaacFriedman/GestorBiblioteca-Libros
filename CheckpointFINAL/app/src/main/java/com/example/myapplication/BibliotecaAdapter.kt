@@ -35,6 +35,7 @@ class BibliotecaAdapter(
             append("Dirección: ${biblioteca["direccion"]}")
             append("\nPresupuesto: $${biblioteca["presupuesto"]}")
             append("\nInaugurada: ${biblioteca["inaugurada"]}")
+            append("\nZona: ${biblioteca["zona"]}")
         }
 
         btnDelete.visibility = if (showDeleteButton) View.VISIBLE else View.GONE

@@ -9,12 +9,25 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.databinding.ActivityBibliotecaBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
+import android.widget.ArrayAdapter
 
 class Biblioteca : AppCompatActivity() {
     private lateinit var binding: ActivityBibliotecaBinding
     private var db: SQLiteDatabase? = null
     private var msg = ""
     private var bId = 0
+
+    private data class ZonaUbicacion(
+        val nombre: String,
+        val latitud: Double,
+        val longitud: Double
+    )
+
+    private val zonas = listOf(
+        ZonaUbicacion("Norte", -0.175, -78.495),
+        ZonaUbicacion("Centro", -0.230, -78.525),
+        ZonaUbicacion("Sur", -0.280, -78.540)
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +70,8 @@ class Biblioteca : AppCompatActivity() {
         binding.btnDelete.setOnClickListener {
             confirmarEliminacion()
         }
+
+        setupZonaSpinner()
     }
 
     private fun habilitarCampos(enabled: Boolean) {
@@ -64,6 +79,7 @@ class Biblioteca : AppCompatActivity() {
         binding.etDireccion.isEnabled = enabled
         binding.etPresupuesto.isEnabled = enabled
         binding.etInaugurada.isEnabled = enabled
+        binding.spinnerZona.isEnabled = enabled
     }
 
     private fun cargarDatosBiblioteca() {
@@ -71,6 +87,12 @@ class Biblioteca : AppCompatActivity() {
         binding.etDireccion.setText(intent.getStringExtra("direccion"))
         binding.etPresupuesto.setText(intent.getDoubleExtra("presupuesto", 0.0).toString())
         binding.etInaugurada.setText(intent.getStringExtra("inaugurada"))
+        
+        val zona = intent.getStringExtra("zona")
+        val position = zonas.indexOfFirst { it.nombre == zona }
+        if (position != -1) {
+            binding.spinnerZona.setSelection(position)
+        }
     }
 
     private fun validarCampos(): Boolean {
@@ -103,15 +125,39 @@ class Biblioteca : AppCompatActivity() {
         return true
     }
 
+    private fun setupZonaSpinner() {
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            zonas.map { it.nombre }
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerZona.adapter = adapter
+
+        // Si estamos en modo edición o eliminación, seleccionar la zona correcta
+        if (msg == "edit" || msg == "delete") {
+            val zonaActual = intent.getStringExtra("zona")
+            val position = zonas.indexOfFirst { it.nombre == zonaActual }
+            if (position != -1) {
+                binding.spinnerZona.setSelection(position)
+            }
+        }
+    }
+
     private fun insertData() {
         if (!validarCampos()) return
 
         try {
+            val zonaSeleccionada = zonas[binding.spinnerZona.selectedItemPosition]
+            
             val values = android.content.ContentValues().apply {
                 put(ConnectionClass.COL_BIBLIOTECA_NOMBRE, binding.etNombre.text.toString().trim())
                 put(ConnectionClass.COL_BIBLIOTECA_DIRECCION, binding.etDireccion.text.toString().trim())
                 put(ConnectionClass.COL_BIBLIOTECA_PRESUPUESTO, binding.etPresupuesto.text.toString().toDouble())
                 put(ConnectionClass.COL_BIBLIOTECA_INAUGURADA, binding.etInaugurada.text.toString().trim())
+                put(ConnectionClass.COL_BIBLIOTECA_LATITUD, zonaSeleccionada.latitud)
+                put(ConnectionClass.COL_BIBLIOTECA_LONGITUD, zonaSeleccionada.longitud)
+                put(ConnectionClass.COL_BIBLIOTECA_ZONA, zonaSeleccionada.nombre)
             }
 
             val result = db?.insert(ConnectionClass.TABLE_BIBLIOTECA, null, values)
@@ -130,11 +176,16 @@ class Biblioteca : AppCompatActivity() {
         if (!validarCampos()) return
 
         try {
+            val zonaSeleccionada = zonas[binding.spinnerZona.selectedItemPosition]
+            
             val values = android.content.ContentValues().apply {
                 put(ConnectionClass.COL_BIBLIOTECA_NOMBRE, binding.etNombre.text.toString().trim())
                 put(ConnectionClass.COL_BIBLIOTECA_DIRECCION, binding.etDireccion.text.toString().trim())
                 put(ConnectionClass.COL_BIBLIOTECA_PRESUPUESTO, binding.etPresupuesto.text.toString().toDouble())
                 put(ConnectionClass.COL_BIBLIOTECA_INAUGURADA, binding.etInaugurada.text.toString().trim())
+                put(ConnectionClass.COL_BIBLIOTECA_LATITUD, zonaSeleccionada.latitud)
+                put(ConnectionClass.COL_BIBLIOTECA_LONGITUD, zonaSeleccionada.longitud)
+                put(ConnectionClass.COL_BIBLIOTECA_ZONA, zonaSeleccionada.nombre)
             }
 
             val selection = "${ConnectionClass.COL_BIBLIOTECA_ID} = ?"

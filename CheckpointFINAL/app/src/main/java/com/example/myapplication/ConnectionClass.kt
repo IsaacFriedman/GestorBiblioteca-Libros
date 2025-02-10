@@ -9,7 +9,7 @@ class ConnectionClass(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
 
     companion object {
         private const val DATABASE_NAME = "biblioteca_db.db"
-        private const val DATABASE_VERSION = 3
+        private const val DATABASE_VERSION = 4
 
         // Constantes para la tabla Biblioteca
         const val TABLE_BIBLIOTECA = "biblioteca"
@@ -18,6 +18,9 @@ class ConnectionClass(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
         const val COL_BIBLIOTECA_DIRECCION = "direccion"
         const val COL_BIBLIOTECA_PRESUPUESTO = "presupuesto"
         const val COL_BIBLIOTECA_INAUGURADA = "inaugurada"
+        const val COL_BIBLIOTECA_LATITUD = "latitud"
+        const val COL_BIBLIOTECA_LONGITUD = "longitud"
+        const val COL_BIBLIOTECA_ZONA = "zona"
 
         // Constantes para la tabla Libro
         const val TABLE_LIBRO = "libro"
@@ -70,7 +73,10 @@ class ConnectionClass(context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
                 $COL_BIBLIOTECA_NOMBRE TEXT NOT NULL,
                 $COL_BIBLIOTECA_DIRECCION TEXT NOT NULL,
                 $COL_BIBLIOTECA_PRESUPUESTO REAL NOT NULL,
-                $COL_BIBLIOTECA_INAUGURADA TEXT NOT NULL
+                $COL_BIBLIOTECA_INAUGURADA TEXT NOT NULL,
+                $COL_BIBLIOTECA_LATITUD REAL NOT NULL,
+                $COL_BIBLIOTECA_LONGITUD REAL NOT NULL,
+                $COL_BIBLIOTECA_ZONA TEXT NOT NULL
             )
         """.trimIndent())
 
